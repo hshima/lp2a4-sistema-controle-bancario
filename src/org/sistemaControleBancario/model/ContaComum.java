@@ -1,23 +1,69 @@
 package org.sistemaControleBancario.model;
 
+import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
-public class ContaComum {
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+@Entity
+@Table(name = "contasComum")
+public class ContaComum implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@Column(name = "numeroConta")
 	protected long numeroConta;
-	protected Date aberturaConta;
-	protected Date fechamentoConta;
+	
+	@Temporal(TemporalType.DATE)
+	@Column(name = "aberturaConta", nullable = false)
+	protected Calendar aberturaConta;
+	
+	@Temporal(TemporalType.DATE)
+	@Column(name = "fechamentoConta")
+	protected Calendar fechamentoConta;
+	
+	@Column(name = "situacaoConta")
 	protected int situacaoConta = 1;
+	
+	@Column(name = "senhaConta")
 	protected int senhaConta;
+	
+	@Column(name = "saldoConta")
 	protected double saldoConta = 0d;
-	protected Pessoa cliente;
+	
+	@Column(name = "clienteId")
+	@ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+	@JoinTable(name = "pessoa_contacomuns", 
+						 joinColumns = {@JoinColumn(name = "numeroconta", referencedColumnName = "numeroConta")},
+					 	inverseJoinColumns = {@JoinColumn( name = "idpessoa", referencedColumnName = "id")})
+	protected Set<Pessoa > clientes;
+	
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "contaMovimento", fetch = FetchType.LAZY)
+	protected Set<Movimento> movimentosConta;
 	
 	// Getters
-	public Date getAberturaConta() {
+	public Calendar getAberturaConta() {
 		return aberturaConta;
 	}
 
-	public Date getFechamentoConta() {
+	public Calendar getFechamentoConta() {
 		return fechamentoConta;
 	}
 
@@ -38,7 +84,7 @@ public class ContaComum {
 	}
 
 	// Setters
-	public void setFechamentoConta(Date fechamentoConta) {
+	public void setFechamentoConta(Calendar fechamentoConta) {
 		this.fechamentoConta = fechamentoConta;
 	}
 
